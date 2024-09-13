@@ -3,7 +3,6 @@ node_modules
 build
 .env
 
-node_modules
 
 # TypeChain files
 /typechain
@@ -12,3 +11,6 @@ node_modules
 # solidity-coverage files
 /coverage
 /coverage.json
+
+src/js/metacoin-config.js
+build
