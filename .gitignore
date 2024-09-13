@@ -1,0 +1,14 @@
+
+node_modules
+build
+.env
+
+node_modules
+
+# TypeChain files
+/typechain
+/typechain-types
+
+# solidity-coverage files
+/coverage
+/coverage.json
