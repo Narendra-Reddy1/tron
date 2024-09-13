@@ -1,5 +1,5 @@
 {
-  "name": "contracts",
+  "name": "fitness-ledger",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@openzeppelin/contracts": "^5.0.2",
     "tronbox": "^3.4.4"
   }
 }
