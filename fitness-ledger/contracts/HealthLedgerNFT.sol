@@ -22,4 +22,8 @@ contract HealthLedgerNFT is ERC721URIStorage, Ownable {
     function _baseURI() internal view override returns (string memory) {
         return s_baseUri;
     }
+
+    function _setBaseURI(string memory _newbaseURI) external onlyOwner {
+        s_baseUri = _newbaseURI;
+    }
 }

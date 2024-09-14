@@ -1,5 +1,6 @@
-const port = process.env.HOST_PORT || 9090
+require("dotenv").config()
 
+const port = process.env.HOST_PORT || 9090
 module.exports = {
   networks: {
     mainnet: {
@@ -21,14 +22,14 @@ Then, run the migration with:
       network_id: '1'
     },
     shasta: {
-      privateKey: process.env.PRIVATE_KEY_SHASTA,
+      privateKey: process.env.PRIVATE_KEY,
       userFeePercentage: 50,
       feeLimit: 1000 * 1e6,
       fullHost: 'https://api.shasta.trongrid.io',
       network_id: '2'
     },
     nile: {
-      privateKey: process.env.PRIVATE_KEY_NILE,
+      privateKey: process.env.PRIVATE_KEY,
       userFeePercentage: 100,
       feeLimit: 1000 * 1e6,
       fullHost: 'https://nile.trongrid.io',
@@ -36,15 +37,15 @@ Then, run the migration with:
     },
     development: {
       // For tronbox/tre docker image
-      privateKey: '0000000000000000000000000000000000000000000000000000000000000001',
+      privateKey: '984b78a83a46596ab90d4252128ace3640a969dc65e1f2ce72107a386fd95d33',
       userFeePercentage: 0,
       feeLimit: 1000 * 1e6,
       fullHost: 'http://127.0.0.1:' + port,
-      network_id: '9'
+      network_id: '*'
     },
     compilers: {
       solc: {
-        version: '0.8.6'
+        version: '0.8.20'
       }
     }
   },
