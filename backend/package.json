@@ -1,22 +1,22 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon server.js"
   },
   "author": "Narendra Reddy",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "bcrypt": "^5.1.1",
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "express": "^4.21.0",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.9.0",
     "mongoose": "^8.6.2",
     "node-cron": "^3.0.3",
-    "tronweb": "^5.3.2"
+    "tronweb": "6.0.0-beta.3"
   },
   "devDependencies": {
     "dotenv": "^16.4.5",
