@@ -11,18 +11,24 @@ userRouter.get("/:username/user-info", getUserInfo)
 userRouter.get("/:username/get-balance", getBalance)
 userRouter.post("/:username/create-wallet", createWallet)
 userRouter.post("/:username/record-steps", recordUserSteps)
-userRouter.post("/test/test", async (req, res) => {
-    try {
-        const tt = await (await getTokenContract()).balanceOf("TKceU1zYmANjLkz7Khz9GM1eYhcisV8zuY").call()
 
-        res.send((Number)(formatToken(tt.toString())))
+userRouter.get("/test/test", async (req, res) => {
+    try {
+        const token = getTokenContract()
+        const tt = await token.balanceOf("TKceU1zYmANjLkz7Khz9GM1eYhcisV8zuY").call()
+
+        const decimal = await token.decimals().call()
+        console.log(decimal)
+
+        res.send((formatToken(tt.toString())))
     }
     catch (e) {
-        console
-            .log(e)
         res.send(e.toString())
+        console.log(e)
     }
 })
+
+
 
 
 module.exports = { userRouter }

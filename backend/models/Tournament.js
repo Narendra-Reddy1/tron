@@ -10,7 +10,7 @@ const Tournament = new mongoose.Schema({
     },
     txHash: {
         type: String,
-        required: true
+        required: false
     },
     startTime: {
         type: Number,
@@ -67,7 +67,8 @@ Tournament.methods.isUserParticipated = async function (username) {
 }
 Tournament.methods.isRunning = async function () {
     const ledgerContract = await getLedgerContract()
-    const result = ledgerContract.isTournamentRunning(this.tournamentId).call()
+    const result = await ledgerContract.isTournamentRunning(this.tournamentId).call()
+    console.log(result)
     return result;
 }
 module.exports = mongoose.model("Tournament", Tournament)

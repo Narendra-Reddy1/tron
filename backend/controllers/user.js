@@ -123,7 +123,7 @@ exports.getBalance = async (req, res) => {
 
         //await getTransactions(publicKey)
 
-        const tokenBalance = await (await getTokenContract()).balanceOf(user.publicKey).call();
+        const tokenBalance = await (getTokenContract()).balanceOf(user.publicKey).call();
         res.json({
             publicKey: user.publicKey,
             balances: {
@@ -155,7 +155,7 @@ exports.withdraw = async (req, res) => {
                 message: `invalid passkey`
             })
         }
-        const balance = await (await getTokenContract()).balanceOf(user.publicKey).call();
+        const balance = await (getTokenContract()).balanceOf(user.publicKey).call();
         const formattedBalance = (Number)(formatToken(balance.toString()));
         if (parsedAmount < 0n || parsedAmount > balance) {
             return res.status(400).json({
@@ -169,14 +169,15 @@ exports.withdraw = async (req, res) => {
         const tokenContract = await getUserTokenContract(wallet.privateKey)
         const tx = await tokenContract.transfer(toAddress, parsedAmount).send({
             feeLimit: 100_000_000,
-            shouldPollResponse: true
+            shouldPollResponse: true,
+            keepTxID: true
         });
         const receipt = await tx.wait();
-        if (receipt.status == 1) {
+        if (tx) {
             const newBalance = await tokenContract.balanceOf(wallet.address).call()
             const formattedBalance = formatToken(newBalance.toString());
             res.status(200).json({
-                txHash: tx.hash,
+                txHash: tx[0],
                 updatedBalance: formattedBalance
             })
         }

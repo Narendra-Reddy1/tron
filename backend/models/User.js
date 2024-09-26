@@ -27,6 +27,19 @@ const userModel = new mongoose.Schema({
         required: false,
 
     },
+    stepsHistory: [
+        {
+            steps: {
+                type: Number,
+                required: false
+            },
+            dateTime: {
+                type: String,
+                required: false
+            }
+        }
+
+    ],
     stepsCount: {
         type: Number,
         required: false,

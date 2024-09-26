@@ -72,10 +72,12 @@ exports.joinTournament = async (req, res) => {
         }
         const tx = await ledgerContract.forceJoinTournament(id, user.publicKey).send({
             feeLimit: 100_000_000,
-            shouldPollResponse: true
+            shouldPollResponse: true,
+            keepTxID: true
         });
-        const receipt = await tx.wait();
-        if (receipt.status == 1) {
+
+        // const receipt = await tx.wait();
+        if (tx) {
             tournament.participants.push({
                 publicKey: user.publicKey,
                 steps: 0,
@@ -88,7 +90,7 @@ exports.joinTournament = async (req, res) => {
             })
             await user.save();
             return res.status(201).json({
-                txHash: tx.hash,
+                txHash: tx[0],
                 tournamentId: id,
                 stepsCount: 0,
             })
@@ -102,6 +104,7 @@ exports.joinTournament = async (req, res) => {
     }
     catch (e) {
         console.log(e)
+        console.log(e.message)
         res.status(500).json({
             error: e.toString()
         });
@@ -141,15 +144,16 @@ exports.recordSteps = async (req, res) => {
         const ledgerContract = getLedgerContract();
         const tx = await ledgerContract.recordSteps(id, participant.publicKey, stepCount).send({
             feeLimit: 100_000_000,
-            shouldPollResponse: true
+            shouldPollResponse: true,
+            keepTxID: true
         });
-        const receipt = await tx.wait();
-        if (receipt.status == 1) {
+        // const receipt = await tx.wait();
+        if (tx) {
             const steps = (Number)(await ledgerContract.getUserStepCount(id, participant.publicKey).call());
             participant.steps += stepCount;
             await tournament.save();
             res.status(200).json({
-                txHash: tx.hash,
+                txHash: tx[0],
                 tournamentId: id,
                 updatedSteps: steps
             })

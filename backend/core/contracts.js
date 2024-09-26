@@ -3,15 +3,17 @@ const { tokenConfig, ledgerConfig, nftConfig } = require("./metadata")
 const { TronWeb } = require("tronweb")
 require("dotenv").config()
 
-
-const getTokenContract = async () => {
+const getTokenContract = () => {
     const tronWeb = getOwnerTronWeb()
-    const tokenContract = await tronWeb.contract().at(tokenConfig.address);
+    //console.log(await tronWeb.isConnected())
+    const tokenContract = tronWeb.contract(tokenConfig.abi, tokenConfig.address)//.at(tokenConfig.address);
+    //const tokenContract = await tronWeb.contract().at(tokenConfig.address)//.at(tokenConfig.address);
     return tokenContract;
 }
-const getLedgerContract = async () => {
+const getLedgerContract = () => {
     const tronweb = getOwnerTronWeb()
-    const ledgerContract = await tronweb.contract().at(ledgerConfig.address);
+    const ledgerContract = tronweb.contract(ledgerConfig.abi, ledgerConfig.address);
+    //const ledgerContract = await tronweb.contract().at(ledgerConfig.address);
     return ledgerContract;
 }
 const getNftContract = async () => {
@@ -41,26 +43,25 @@ const getUserNftContract = async (privateKey) => {
 //     return new ethers.Wallet(process.env.OWNER_PRIVATE_KEY, getProvider())
 // }
 
+let ownerTronWeb;
+
 const getOwnerTronWeb = () => {
+
     return new TronWeb({
-        userFeePercentage: 100,
-        feeLimit: 1e9,
+        //userFeePercentage: 100,
         fullHost: 'https://nile.trongrid.io',
-        headers: { 'TRON-PRO-API-KEY': process.env.TRON_GRID_API_KEY },
-        network_id: '3',
-        timeout: 60000,
+        //headers: { 'TRON-PRO-API-KEY': process.env.TRON_GRID_API_KEY },
+        // network_id: '3',
         privateKey: process.env.PRIVATE_KEY
     })
 }
 
 const getTronWeb = (privateKey) => {
     return new TronWeb(
-
         {
             userFeePercentage: 100,
-            feeLimit: 1e9,
             fullHost: 'https://nile.trongrid.io',
-            headers: { 'TRON-PRO-API-KEY': process.env.TRON_GRID_API_KEY },
+            //headers: { 'TRON-PRO-API-KEY': process.env.TRON_GRID_API_KEY },
             network_id: '3',
             privateKey: privateKey
         })

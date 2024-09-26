@@ -47,30 +47,33 @@ exports.createTournament = async (req, res) => {
             })
         }
 
-        const ledgerContract = await getLedgerContract();
-        const tokenTx = await (await getTokenContract()).approve(ledgerConfig.address, parseToken(prizePool)).send({
+        const ledgerContract = getLedgerContract();
+        const isApproved = await (getTokenContract()).approve(ledgerConfig.address, parseToken(prizePool)).send({
             feeLimit: 100_000_000,
             shouldPollResponse: true
         });
-        console.log("TOKEN::: ", tokenTx);
-        const tokenReceipt = await tokenTx.wait();
-        if (tokenReceipt.status != 1) {
+        console.log("TOKEN::: ", isApproved);
+        // const tokenReceipt = await tokenTx.wait();
+        if (!isApproved) {
             res.status(500).json({
                 message: "approval transaction is not finalized on blockchain"
             })
         }
         const tx = await ledgerContract.startTournament(startTime, endTime, parseToken(prizePool)).send({
             feeLimit: 100_000_000,
-            shouldPollResponse: true
+            shouldPollResponse: true,
+            keepTxID: true
+
         });
         console.log(tx);
-        const receipt = await tx.wait();
-        if (receipt.status == 1) {
+        console.log(tx[0]);
+        //const receipt = await tx.wait();
+        if (tx) {
             const tournamentId = await ledgerContract.getLastTournamentId().call();
 
             const tournament = await Tournament.create({
                 tournamentId: (Number)(tournamentId),
-                txHash: tx.hash,
+                txHash: tx[0],
                 startTime: startTime,
                 endTime: endTime,
                 prizePool: prizePool,
@@ -78,13 +81,15 @@ exports.createTournament = async (req, res) => {
             });
             await tournament.save();
 
-            const task = cron.schedule("* * * * * * ", () => {
-                //Disperse  funds. for the  completed  tournament
-                dispereseFundsToWinners();
-            }, {
-                timezone: "Asia/Kolkata"
-            })
-            cronJob = task;
+            //this is not an ideal solution...
+            //what if the server is restarted???
+            // const task = cron.schedule("* * * * * * ", () => {
+            //     //Disperse  funds. for the  completed  tournament
+            //     dispereseFundsToWinners();
+            // }, {
+            //     timezone: "Asia/Kolkata"
+            // })
+            //cronJob = task;
             // cronJob.push({
             //     task: task,
             //     isDispersingRewards: false,
@@ -92,7 +97,7 @@ exports.createTournament = async (req, res) => {
             // }
             // );
             return res.status(201).json({
-                txHash: tx.hash,
+                txHash: tx[0],
                 tournamentId: (Number)(tournamentId),
                 prizeDistribution: prizeDistribution
             })
