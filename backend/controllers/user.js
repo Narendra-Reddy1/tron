@@ -2,12 +2,12 @@ const { TronWeb, BigNumber } = require("tronweb");
 const UserModel = require("../models/User");
 const bcrypt = require("bcryptjs");
 const { getTokenContract, getProvider, getDefaultRunner, getTronWeb, getUserTokenContract } = require("../core/contracts");
-const { encryptData, formatToken, decryptoData } = require("../utils/utils");
+const { encryptData, formatToken, decryptoData, parseToken } = require("../utils/utils");
 
 
 exports.createWallet = async (req, res) => {
     try {
-        const username = req.params.username;
+        //const username = req.user.username;
         const passkey = req.body.passkey;
 
         //if only user name? then any one can trigger this API to create wallet. PREVENT ITT
@@ -18,7 +18,7 @@ exports.createWallet = async (req, res) => {
         //         message: "Secuirity Pin is short"
         //     }))
         // }
-        const user = await UserModel.findOne({ username: username });
+        const user = req.user//await UserModel.findOne({ username: username });
         if (user.wallet != null | undefined) {
             return res.status(409).json({
                 message: "wallet already exists"
@@ -48,12 +48,12 @@ exports.createWallet = async (req, res) => {
 
 exports.getUserInfo = async (req, res) => {
     try {
-        const user = await UserModel.findOne({ username: req.params.username });
-        if (!user) {
-            return res.status(404).json({
-                message: `User not found with username: ${req.body.username}`
-            })
-        }
+        const user = req.user//await UserModel.findOne({ username: req.user.username });
+        // if (!user) {
+        //     return res.status(404).json({
+        //         message: `User not found with username: ${req.body.username}`
+        //     })
+        // }
         let tokenBalance = 0;
         if (user.publicKey != null && user.publicKey != "") {
             const tokenContract = (await getTokenContract())
@@ -79,7 +79,7 @@ exports.getUserInfo = async (req, res) => {
 
 exports.recordUserSteps = async (req, res) => {
     try {
-        const username = req.params.username;
+        const username = req.user.username;
         const steps = req.body.steps;
 
         if (steps < 0) {
@@ -97,7 +97,8 @@ exports.recordUserSteps = async (req, res) => {
         await user.save();
         res.status(200).json({
             username: username,
-            updatedSteps: user.stepsCount
+            updatedSteps: user.stepsCount,
+            addedStepsCount: steps
         })
     }
     catch (e) {
@@ -111,7 +112,7 @@ exports.recordUserSteps = async (req, res) => {
 exports.getBalance = async (req, res) => {
     try {
 
-        const username = req.params.username;
+        const username = req.user.username;
         const user = await UserModel.findOne({ username: username })
         if (user == (null | undefined)) return res.status(404).json({
             message: "user not found"
@@ -140,10 +141,10 @@ exports.getBalance = async (req, res) => {
 }
 exports.withdraw = async (req, res) => {
     try {
-        const username = req.params.username;
+        const username = req.user.username;
         const { passkey, amount, toAddress } = req.body;
         const user = await UserModel.findOne({ username: username });
-        const parsedAmount = ethers.parseEther(amount.toString());
+        const parsedAmount = parseToken(amount);
         if (!user) {
             return res.status(404).json({
                 message: `user not found with username: ${username}`
@@ -157,7 +158,7 @@ exports.withdraw = async (req, res) => {
         }
         const balance = await (getTokenContract()).balanceOf(user.publicKey).call();
         const formattedBalance = (Number)(formatToken(balance.toString()));
-        if (parsedAmount < 0n || parsedAmount > balance) {
+        if (Number(parsedAmount) < 0 || BigNumber(parsedAmount) > balance) {
             return res.status(400).json({
                 message: "invalid balance",
                 requestedAmount: amount,
@@ -172,7 +173,6 @@ exports.withdraw = async (req, res) => {
             shouldPollResponse: true,
             keepTxID: true
         });
-        const receipt = await tx.wait();
         if (tx) {
             const newBalance = await tokenContract.balanceOf(wallet.address).call()
             const formattedBalance = formatToken(newBalance.toString());

@@ -63,7 +63,6 @@ exports.createTournament = async (req, res) => {
             feeLimit: 100_000_000,
             shouldPollResponse: true,
             keepTxID: true
-
         });
         console.log(tx);
         console.log(tx[0]);
@@ -126,26 +125,24 @@ async function dispereseFundsToWinners() {
             tournament = await tournament.save();
         }
         if (tournament.isEnded && tournament.areRewardsDispersed) {
-            cronJob.stop();
+            //cronJob.stop();
             return;
         }
         else if (tournament.isEnded && !tournament.areRewardsDispersed) {
 
-            const ledgerContract = await getLedgerContract();
+            const ledgerContract = getLedgerContract();
             const participants = tournament.participants.sort((a, b) => {
                 return (b.steps - a.steps)
             });
-
             for (let i = 0; i < participants.length; i++) {
                 if (i >= 100) break;
                 const publicKey = participants[i].publicKey;
                 const share = getPrizePoolShare(i + 1);
-                const tx = await ledgerContract.rewardWinner(tournament.tournamentId, publicKey, parseToken(share)).send({
+                const isSuccess = await ledgerContract.rewardWinner(tournament.tournamentId, publicKey, parseToken(share)).send({
                     feeLimit: 100_000_000,
                     shouldPollResponse: true
                 });
-                const resp = await tx.wait();
-                if (resp.status != 1) {
+                if (!isSuccess) {
                     console.log("Failed transaction ", participants[i].username, share);
                 }
             }

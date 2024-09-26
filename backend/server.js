@@ -5,7 +5,10 @@ const { authRouter } = require("./routes/auth");
 const { tournamentRouter } = require("./routes/tournament");
 const { adminRouter } = require("./routes/admin");
 const { configRouter } = require("./routes/config");
-const { TronWeb } = require("tronweb")
+const cron = require("node-cron")
+const User = require("./models/User");
+const { getLedgerContract } = require("./core/contracts");
+const { validateToken } = require("./middlewares/checkAuthentication");
 require("dotenv").config()
 
 
@@ -13,24 +16,36 @@ const app = express();
 app.use(express.json());
 
 app.use(authRouter);
-app.use("/tournament", tournamentRouter);
-app.use(userRouter);
+app.use("/tournament", validateToken, tournamentRouter);
+app.use(validateToken, userRouter);
 app.use(configRouter);
 app.use("/admin", adminRouter);
+
+async function resetUserDailySteps() {
+    const users = await User.find({})
+    users.forEach(user => {
+        user.stepsHistory.push({
+            steps: user.stepsCount || 0,
+            dateTime: user.currentDate || 0
+        })
+        user.stepsCount = 0;
+        user.currentDate = Date.now() / 1000
+    });
+}
 
 try {
     mongoose.connect(`mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@cluster0.y6m6z3o.mongodb.net/fitness-ledger`).then(result => {
         console.log("Connected to DB...");
-        app.listen(process.env.PORT || 3000, async () => {
-            // global.tronWeb = new TronWeb({
-            //     userFeePercentage: 100,
-            //     feeLimit: 1e9,
-            //     fullHost: 'https://nile.trongrid.io',
-            //     timeout: 60000,
-            //     privateKey: process.env.PRIVATE_KEY
-            // })
-            // console.log(await global.tronWeb.isConnected())
+        // getLedgerContract().methods.getTournamentInfo(0).call().then(res => {
+        //     console.log(res)
+        // })
 
+
+
+        app.listen(process.env.PORT || 3000, async () => {
+            cron.schedule('0 0 * * *', () => {
+                resetUserDailySteps()
+            });
             console.log("Connected to server...", process.env.PORT || 3000);
         });
     })

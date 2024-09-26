@@ -38,6 +38,52 @@ exports.getTournament = async (req, res) => {
     }
 }
 
+exports.getLatestTournament = async (req, res) => {
+    try {
+        const ledgerContract = getLedgerContract();
+        const id = await ledgerContract.methods.getLastTournamentId().call()
+        console.log(Number(id));
+        const tournament = await Tournament.findOne({ tournamentId: Number(id) })
+
+        if (tournament) {
+            if (tournament.participants?.length > 1)
+                tournament.participants?.sort((a, b) => {
+                    return (b.steps - a.steps)
+                });
+            const distribution = await prizeDistribution.findOne({ id: tournament.prizeDistributionId });
+            return res.status(200).json({
+                data: tournament,
+                distribution: distribution.distribution
+            })
+        }
+        //this part should not trigger in normal cases.
+        const info = await ledgerContract.methods.getTournamentInfo(id).call()
+        if (info == [0, 0, 0]) {
+            return res.status(404).json({
+                message: `Tournament not found ${id}`
+            })
+        }
+        const distribution = await prizeDistribution.findOne({ id: 0 });
+        return res.status(200).json({
+            message: "Unusual case triggered",
+            data: {
+                tournamentId: id,
+                startTime: info[0],
+                endTime: info[1],
+                prizePool: info[2],
+                participants: []
+            },
+            distribution: distribution.distribution
+        })
+    }
+    catch (e) {
+        console.log(e)
+        res.status(500).json({
+            message: "something went wrong in fetching tournament data"
+        })
+    }
+}
+
 
 
 exports.joinTournament = async (req, res) => {
@@ -45,7 +91,7 @@ exports.joinTournament = async (req, res) => {
 
         const id = req.body.tournamentId;
         const username = req.body.username;
-        const user = await UserModel.findOne({ username: username });
+        const user = req.user//await UserModel.findOne({ username: username });
         if (!user) {
             return res.status(404).json({
                 message: `user not found with username: ${username}`
@@ -115,7 +161,7 @@ exports.recordSteps = async (req, res) => {
     try {
         //use spread operator bc
         const stepCount = req.body.steps;
-        const username = req.body.username;
+        const username = req.user.username;
         const id = req.body.tournamentId;
 
         if (stepCount < 0) {
@@ -155,7 +201,8 @@ exports.recordSteps = async (req, res) => {
             res.status(200).json({
                 txHash: tx[0],
                 tournamentId: id,
-                updatedSteps: steps
+                updatedSteps: steps,
+                addedStepsCount: stepCount
             })
         }
         else {

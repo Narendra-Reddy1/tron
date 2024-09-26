@@ -1,7 +1,9 @@
+require("dotenv").config()
 const { ethers } = require("ethers");
 const bcrypt = require("bcryptjs")
 const UserModel = require("../models/User");
 const { getTokenContract, getDefaultRunner } = require("../core/contracts");
+const jwt = require("jsonwebtoken")
 
 exports.postSignup = async (req, res) => {
     //const walletData = await createWallet();
@@ -20,8 +22,17 @@ exports.postSignup = async (req, res) => {
             stepsCount: 0,
         })
         await user.save();
+        console
+            .log(process.env.JWT_KEY)
+        const token = jwt.sign({
+            username: req.body.username,
+            publicKey: user.publicKey || "0x", //rn public key is null
+        }, process.env.JWT_KEY, {
+            expiresIn: "7d"
+        })
         res.status(201).json({
             user: {
+                token: token,
                 username: user.username,
                 steps: user.stepsCount
             }
@@ -37,7 +48,6 @@ exports.postSignup = async (req, res) => {
 
 exports.postLogin = async (req, res) => {
     try {
-
         const user = await UserModel.findOne({ username: req.body.username });
         let isMatched = false;
         if (user)
@@ -47,11 +57,19 @@ exports.postLogin = async (req, res) => {
                 message: "Invalid credentials"
             })
         }
+
         let tokenBalance = 0;
         // if (user.publicKey)
         //     tokenBalance = await (await getTokenContract()).balanceOf(user.publicKey)
+        const token = jwt.sign({
+            username: user.username,
+            publicKey: user.publicKey || "0x"
+        }, process.env.JWT_KEY, {
+            expiresIn: "7d"
+        })
         res.status(200).json({
             user: {
+                token: token,
                 username: user.username,
                 stepsCount: user.stepsCount,
                 publicKey: user.publicKey,

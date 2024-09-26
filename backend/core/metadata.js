@@ -12,8 +12,4 @@ const nftConfig = {
     address: "",
     abi: []
 }
-
-
-
-
 module.exports = { tokenConfig, ledgerConfig, nftConfig }

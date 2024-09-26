@@ -34,7 +34,7 @@ const userModel = new mongoose.Schema({
                 required: false
             },
             dateTime: {
-                type: String,
+                type: Number,
                 required: false
             }
         }
@@ -43,6 +43,10 @@ const userModel = new mongoose.Schema({
     stepsCount: {
         type: Number,
         required: false,
+    },
+    currentDate: {
+        type: Number,
+        required: false
     },
     tournaments: [{
         tournamentId: {
