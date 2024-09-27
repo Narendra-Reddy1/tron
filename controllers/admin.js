@@ -16,7 +16,7 @@ exports.createTournament = async (req, res) => {
     try {
 
         const { adminId, startTime, endTime, prizePool, prizeDistributionId } = req.body;
-        if (!process.env.ADMIN_ID == adminId) {
+        if (process.env.ADMIN_ID != adminId) {
             return sendError(403, `Unauthorized`, res);
         }
         //const tournament = await Tournament.findOne({ tournamentId: tournamentId });
