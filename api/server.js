@@ -14,13 +14,17 @@ require("dotenv").config()
 const app = express();
 app.use(express.json());
 app.use(cors())
-
 app.use(authRouter);
 app.use(configRouter);
 app.use("/admin", adminRouter);
 app.use("/tournament", validateToken, tournamentRouter);
-app.use(validateToken, userRouter);
+app.use("/user", validateToken, userRouter);
 
+app.use("/", (req, res) => {
+    res.json({
+        message: "working great"
+    })
+})
 async function resetUserDailySteps() {
     const users = await User.find({})
     users.forEach(user => {
