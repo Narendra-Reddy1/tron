@@ -49,6 +49,7 @@ try {
             console.log("Connected to server...", process.env.PORT || 3000);
         });
     })
+    module.exports = app;
 }
 catch (e) {
     console.log(e)
