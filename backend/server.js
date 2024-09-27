@@ -43,9 +43,9 @@ try {
 
 
         app.listen(process.env.PORT || 3000, async () => {
-            cron.schedule('0 0 * * *', () => {
-                resetUserDailySteps()
-            });
+            // cron.schedule('0 0 * * *', () => {
+            //     resetUserDailySteps()
+            // });
             console.log("Connected to server...", process.env.PORT || 3000);
         });
     })

@@ -22,17 +22,25 @@ exports.postSignup = async (req, res) => {
             stepsCount: 0,
         })
         await user.save();
-        console
-            .log(process.env.JWT_KEY)
+
         const token = jwt.sign({
             username: req.body.username,
             publicKey: user.publicKey || "0x", //rn public key is null
         }, process.env.JWT_KEY, {
             expiresIn: "7d"
         })
+
+        const fallbackToken = jwt.sign({
+            username: user.username,
+            publicKey: user.publicKey || "0x"
+        }, process.env.JWT_KEY, {
+            expiresIn: "14d"
+        })
+
         res.status(201).json({
             user: {
                 token: token,
+                fallbacktoken: fallbackToken,
                 username: user.username,
                 steps: user.stepsCount
             }
@@ -67,9 +75,16 @@ exports.postLogin = async (req, res) => {
         }, process.env.JWT_KEY, {
             expiresIn: "7d"
         })
+        const fallbackToken = jwt.sign({
+            username: user.username,
+            publicKey: user.publicKey || "0x"
+        }, process.env.JWT_KEY, {
+            expiresIn: "14d"
+        })
         res.status(200).json({
             user: {
                 token: token,
+                fallbackToken: fallbackToken,
                 username: user.username,
                 stepsCount: user.stepsCount,
                 publicKey: user.publicKey,
