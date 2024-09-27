@@ -8,7 +8,7 @@ const { configRouter } = require("./routes/config");
 const cron = require("node-cron")
 const User = require("./models/User");
 const { getLedgerContract } = require("./core/contracts");
-const { validateToken } = require("./middlewares/checkAuthentication");
+const { validateToken } = require("./backend/middlewares/checkAuthentication");
 require("dotenv").config()
 
 

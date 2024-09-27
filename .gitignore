@@ -13,4 +13,4 @@ node_modules
 
 src/js/metacoin-config.js
 build
-backend/core/config.js
+core/config.js
