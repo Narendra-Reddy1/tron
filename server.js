@@ -9,11 +9,13 @@ const cron = require("node-cron")
 const User = require("./models/User");
 const { getLedgerContract } = require("./core/contracts");
 const { validateToken } = require("./backend/middlewares/checkAuthentication");
+const cors = require('cors')
 require("dotenv").config()
 
 
 const app = express();
 app.use(express.json());
+app.use(cors())
 
 app.use(authRouter);
 app.use("/tournament", validateToken, tournamentRouter);
