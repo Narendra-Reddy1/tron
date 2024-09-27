@@ -1,5 +1,4 @@
 const { ethers } = require("ethers");
-const { adminConfig } = require("../core/config");
 const { getLedgerContract, getOwner, getTokenContract } = require("../core/contracts");
 const PrizeDistribution = require("../models/prizeDistribution");
 const Tournament = require("../models/Tournament");
@@ -17,7 +16,7 @@ exports.createTournament = async (req, res) => {
     try {
 
         const { adminId, startTime, endTime, prizePool, prizeDistributionId } = req.body;
-        if (!adminConfig.admins.includes(adminId)) {
+        if (!process.env.ADMIN_ID == adminId) {
             return sendError(403, `Unauthorized`, res);
         }
         //const tournament = await Tournament.findOne({ tournamentId: tournamentId });
