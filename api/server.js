@@ -16,10 +16,10 @@ app.use(express.json());
 app.use(cors())
 
 app.use(authRouter);
-app.use("/tournament", validateToken, tournamentRouter);
-app.use(validateToken, userRouter);
 app.use(configRouter);
 app.use("/admin", adminRouter);
+app.use("/tournament", validateToken, tournamentRouter);
+app.use(validateToken, userRouter);
 
 async function resetUserDailySteps() {
     const users = await User.find({})
@@ -42,15 +42,15 @@ try {
 
 
 
-        app.listen(process.env.PORT || 3000, async () => {
+        app.listen(process.env.PORT || 4000, async () => {
             // cron.schedule('0 0 * * *', () => {
             //     resetUserDailySteps()
             // });
-            console.log("Connected to server...", process.env.PORT || 3000);
+            console.log("Connected to server...", process.env.PORT || 4000);
         });
     })
-    module.exports = app;
 }
 catch (e) {
     console.log(e)
 }
+module.exports = app;

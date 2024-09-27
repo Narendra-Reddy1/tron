@@ -13,15 +13,24 @@ exports.getPrizeDistribution = async (req, res) => {
     res.status(200).json(distro.distribution);
 }
 exports.getwalletConfig = async (req, res) => {
-    const config = await coreConfig.findOne({ index: 0 });
-    if (!config) {
-        console.error("Something messed up with coreConfig Data");
-        return res.status(500).send(JSON.stringify({
+    try {
+
+        const config = await coreConfig.findOne({ index: 0 });
+        if (!config) {
+            console.log("Something messed up with coreConfig Data");
+            return res.status(500).send(JSON.stringify({
+                message: "something messed up with coreConfig"
+            }))
+        }
+        res.status(200).json(
+            {
+                wallet: config.wallet
+            });
+    }
+    catch (e) {
+        console.log(e)
+        res.status(500).send(JSON.stringify({
             message: "something messed up with coreConfig"
         }))
     }
-    res.status(200).json(
-        {
-            wallet: config.wallet
-        });
 }
