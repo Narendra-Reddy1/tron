@@ -14,3 +14,4 @@ node_modules
 src/js/metacoin-config.js
 build
 core/config.js
+.vercel
