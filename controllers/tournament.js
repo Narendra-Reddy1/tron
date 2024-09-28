@@ -3,6 +3,7 @@ const prizeDistribution = require("../models/prizeDistribution");
 const Tournament = require("../models/Tournament");
 const UserModel = require("../models/User");
 const cron = require("node-cron");
+const { formatToken } = require("../utils/utils");
 
 
 //creating tournament is admin task
@@ -67,10 +68,10 @@ exports.getLatestTournament = async (req, res) => {
         return res.status(200).json({
             message: "Unusual case triggered",
             data: {
-                tournamentId: id,
+                tournamentId: Number(id),
                 startTime: Number(info[0]),
                 endTime: Number(info[1]),
-                prizePool: Number(info[2]),
+                prizePool: formatToken(Number(info[2])),
                 participants: []
             },
             distribution: distribution.distribution

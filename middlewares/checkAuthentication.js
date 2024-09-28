@@ -25,7 +25,7 @@ exports.validateToken = async (req, res, next) => {
         if (e.name === "JsonWebTokenError") {
             return res.status(403).json({ message: "Invalid token. Please re-login" });
         }
-        return res.status(403).json({ message: "An issue occurred with the token" });
+        return res.status(403).json({ message: "An issue occurred with the token " + e.toString() });
 
     }
 }

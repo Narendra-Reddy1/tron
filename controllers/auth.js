@@ -49,7 +49,7 @@ exports.postSignup = async (req, res) => {
     catch (e) {
         console.log(e);
         res.status(500).json({
-            message: e
+            message: e.toString()
         });
     }
 }
@@ -95,7 +95,7 @@ exports.postLogin = async (req, res) => {
     catch (e) {
         console.log(e);
         res.status(500).json({
-            message: e
+            message: e.toString()
         });
     }
 }
