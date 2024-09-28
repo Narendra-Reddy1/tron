@@ -68,9 +68,9 @@ exports.getLatestTournament = async (req, res) => {
             message: "Unusual case triggered",
             data: {
                 tournamentId: id,
-                startTime: info[0],
-                endTime: info[1],
-                prizePool: info[2],
+                startTime: Number(info[0]),
+                endTime: Number(info[1]),
+                prizePool: Number(info[2]),
                 participants: []
             },
             distribution: distribution.distribution
