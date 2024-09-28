@@ -46,12 +46,12 @@ try {
 
 
 
-        app.listen(process.env.PORT || 4000, async () => {
-            // cron.schedule('0 0 * * *', () => {
-            //     resetUserDailySteps()
-            // });
-            console.log("Connected to server...", process.env.PORT || 4000);
-        });
+        // app.listen(process.env.PORT || 4000, async () => {
+        //     // cron.schedule('0 0 * * *', () => {
+        //     //     resetUserDailySteps()
+        //     // });
+        //     console.log("Connected to server...", process.env.PORT || 4000);
+        // });
     })
 }
 catch (e) {
