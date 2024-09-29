@@ -25,7 +25,7 @@ app.use("/", (req, res) => {
         message: "working great"
     })
 })
-async function resetUserDailySteps() {
+async function MONGO_DEFAULT_DB() {
     const users = await User.find({})
     users.forEach(user => {
         user.stepsHistory.push({

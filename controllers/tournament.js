@@ -43,7 +43,6 @@ exports.getLatestTournament = async (req, res) => {
     try {
         const ledgerContract = getLedgerContract();
         const id = await ledgerContract.methods.getLastTournamentId().call()
-        console.log(Number(id));
         const tournament = await Tournament.findOne({ tournamentId: Number(id) })
 
         if (tournament) {
@@ -196,7 +195,7 @@ exports.recordSteps = async (req, res) => {
         });
         // const receipt = await tx.wait();
         if (tx) {
-            const steps = (Number)(await ledgerContract.getUserStepCount(id, participant.publicKey).call());
+            const steps = Number(await ledgerContract.getUserStepCount(id, participant.publicKey).call());
             participant.steps += stepCount;
             await tournament.save();
             res.status(200).json({
