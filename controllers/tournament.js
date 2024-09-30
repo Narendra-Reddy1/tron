@@ -90,11 +90,10 @@ exports.joinTournament = async (req, res) => {
     try {
 
         const id = req.body.tournamentId;
-        const username = req.body.username;
         const user = req.user//await UserModel.findOne({ username: username });
         if (!user) {
             return res.status(404).json({
-                message: `user not found with username: ${username}`
+                message: `user not found with username: ${user.username}`
             })
         }
         const tournament = await Tournament.findOne({ tournamentId: id });
@@ -127,7 +126,7 @@ exports.joinTournament = async (req, res) => {
             tournament.participants.push({
                 publicKey: user.publicKey,
                 steps: 0,
-                username: username,
+                username: user.username,
             })
             await tournament.save();
             user.tournaments.push({

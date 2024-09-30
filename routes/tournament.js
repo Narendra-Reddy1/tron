@@ -3,8 +3,6 @@ const { getTournament, joinTournament, recordSteps, getLatestTournament } = requ
 
 const tournamentRouter = express.Router();
 
-
-
 tournamentRouter.get("/get-latest-tournament", getLatestTournament)
 tournamentRouter.post("/join", joinTournament)
 tournamentRouter.post("/record-steps", recordSteps);
